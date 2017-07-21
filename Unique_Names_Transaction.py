@@ -1,15 +1,17 @@
 import json
 from difflib import SequenceMatcher
 
+
 # IN: List<String> filled with logic -> [i]==name [i+1]==nickname
 # OUT: Dict{name<String>:nicknames[]} == {name_1:[nickname1_1,nickname1_2],name_2:[nickname2_1]...nickname_i:[]}
-def makeDict(list,maDict):
-    for i in range(1,len(list),2):
-        if list[i-1] in maDict:
-            maDict[list[i-1]].append(list[i])
+def makeDict(list, maDict):
+    for i in range(1, len(list), 2):
+        if list[i - 1] in maDict:
+            maDict[list[i - 1]].append(list[i])
         else:
-            maDict[list[i-1]] = []
-            maDict[list[i-1]].append(list[i])
+            maDict[list[i - 1]] = []
+            maDict[list[i - 1]].append(list[i])
+
 
 # IN: search_key<String>, text<String>, strictness<Int>
 # OUT: TRUE if search_key and text is similar in strictness ratio, else FALSE.
@@ -23,13 +25,15 @@ def fuzzy_search(search_key, text, strictness):
                 return True
         return False
 
+
 # IN: Dict{name<String>:nicknames[]} == {name_1:[nickname1_1,nickname1_2],name_2:[nickname2_1]...nickname_i:[]}
 # OUT: Dict{nickname<String>:nicknames[]} -> nicknames in list become keys and their value is the list they were in.
-def util_dict(my_dict, key, value,result):
-    if not(value in result):
+def util_dict(my_dict, key, value, result):
+    if not (value in result):
         result[value] = []
     for nick in my_dict[key]:
         result[value].append(nick)
+
 
 # IN: Transaction details ( billNameOnCard splitted ) billFirstName<String>, billLastName<String>, shipFirstName<String>
 #                                               , shipLastName<String> , c_first<String>, c_last<String>, card<String>
@@ -156,6 +160,7 @@ def countUniqueNames_Action(billFirstName, billLastName, shipFirstName, shipLast
     else:
         return 3
 
+
 # IN: billFirstName<String>, billLastName<String>, shipFirstName<String>, shipLastName<String>, billNameOnCard<String>
 # OUT: Number of unique people in a transaction.
 def countUniqueNames(billFirstName, billLastName, shipFirstName, shipLastName, billNameOnCard):
@@ -220,38 +225,37 @@ def countUniqueNames(billFirstName, billLastName, shipFirstName, shipLastName, b
         countUniqueNames_Action(billLastName, billFirstName, shipLastName, shipFirstName, c_last, c_first, r_card))
     return min(my_results)
 
+
 #############################################
 ####### ORGANIZING THE DATA STRUCTURE #######
 # Database of nicknames
 with open('nicks.json', 'r') as f:
-    list_nick = json.load(f)    # List<String> filled with logic -> [i]==name [i+1]==nickname
+    list_nick = json.load(f)  # List<String> filled with logic -> [i]==name [i+1]==nickname
 
-
-dict_nick = {}                  # Dict{name<String>:nicknames[]}
-makeDict(list_nick,dict_nick)   # make dict_nick[name] -> [nickname_1,nickname_2,nickname_3.....nickname_i]
-result = {}                     # temp
+dict_nick = {}  # Dict{name<String>:nicknames[]}
+makeDict(list_nick, dict_nick)  # make dict_nick[name] -> [nickname_1,nickname_2,nickname_3.....nickname_i]
+result = {}  # temp
 
 # In all keys, the strings in list will become keys in dictionary. Their value is the list they were in.
 for key in dict_nick.keys():
     dict_nick[key].append(key)
     for value in dict_nick[key]:
-        util_dict(dict_nick,key,value,result)
+        util_dict(dict_nick, key, value, result)
 # store result in dict_nick
 dict_nick = result
 #############################################
 
-print str(countUniqueNames("Elii","Liz","Elijah","Liz","Liz Eli")) + "$$$  1"
-print str(countUniqueNames("Tomer","Eyzenberg","Revital","Eyzenberg","TomerEyzenberg")) + "$$$  2"
-print str(countUniqueNames("Tomer","Eyzenberg","Revital","Eyzenberg","TomrEyzenberg")) + "$$$  2"
-print str(countUniqueNames("Tomer","Eyzenberg","Revital","Eyzenberg","Tomer Eyzenberggg")) + "$$$  2"
-print str(countUniqueNames("Deborah","Egli","Debie","Egli","Debbie Egli")) + "$$$  1"
-print str(countUniqueNames("Deborah","Egni","Deborah","Egli","Deborah Egli")) + "$$$  1"
-print str(countUniqueNames("Deboah S","Egli","Deborah","Egli","Eglii Deborah")) + "$$$  1"
-print str(countUniqueNames("Tomer","Egli","Deborah","Egli","Michele Egli")) + "$$$  3"
+print str(countUniqueNames("Elii", "Liz", "Elijah", "Liz", "Liz Eli")) + "$$$  1"
+print str(countUniqueNames("Tomer", "Eyzenberg", "Revital", "Eyzenberg", "TomerEyzenberg")) + "$$$  2"
+print str(countUniqueNames("Tomer", "Eyzenberg", "Revital", "Eyzenberg", "TomrEyzenberg")) + "$$$  2"
+print str(countUniqueNames("Tomer", "Eyzenberg", "Revital", "Eyzenberg", "Tomer Eyzenberggg")) + "$$$  2"
+print str(countUniqueNames("Deborah", "Egli", "Debie", "Egli", "Debbie Egli")) + "$$$  1"
+print str(countUniqueNames("Deborah", "Egni", "Deborah", "Egli", "Deborah Egli")) + "$$$  1"
+print str(countUniqueNames("Deboah S", "Egli", "Deborah", "Egli", "Eglii Deborah")) + "$$$  1"
+print str(countUniqueNames("Tomer", "Egli", "Deborah", "Egli", "Michele Egli")) + "$$$  3"
 print "Examples"
-print str(countUniqueNames("Deborah","Egli","Deborah","Egli","Deborah Egli")) + "$$$  1"
-print str(countUniqueNames("Deborah","Egli","Debbie","Egli","Debbie Egli")) + "$$$  1"
-print str(countUniqueNames("Deborah","Egni","Deborah","Egli","Deborah Egli")) + "$$$  1"
-print str(countUniqueNames("Deborah S","Egli","Deborah","Egli","Egli Deborah")) + "$$$  1"
-print str(countUniqueNames("Michele","Egli","Deborah","Egli","Michele Egli")) + "$$$  2"
-
+print str(countUniqueNames("Deborah", "Egli", "Deborah", "Egli", "Deborah Egli")) + "$$$  1"
+print str(countUniqueNames("Deborah", "Egli", "Debbie", "Egli", "Debbie Egli")) + "$$$  1"
+print str(countUniqueNames("Deborah", "Egni", "Deborah", "Egli", "Deborah Egli")) + "$$$  1"
+print str(countUniqueNames("Deborah S", "Egli", "Deborah", "Egli", "Egli Deborah")) + "$$$  1"
+print str(countUniqueNames("Michele", "Egli", "Deborah", "Egli", "Michele Egli")) + "$$$  2"
